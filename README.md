@@ -1,6 +1,6 @@
 # 技能与提示词查看器（@local/skills-inspector）
 
-[![Release](https://img.shields.io/github/v/release/xvxufyg/dsh-skills-inspector?label=version)](https://github.com/xvxufyg/dsh-skills-inspector/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Platform](https://img.shields.io/badge/platform-DeepSeek%20Harness-orange)](https://github.com/deepseek-ai/deepseek-harness) [![Auto Translation](https://img.shields.io/badge/translation-auto%20CN-blueviolet)](#功能)
+[![Release](https://img.shields.io/github/v/release/xvxufyg/dsh-skills-inspector?label=version)](https://github.com/xvxufyg/dsh-skills-inspector/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Platform](https://img.shields.io/badge/platform-DeepSeek%20Harness-orange)](https://github.com/deepseek-ai/deepseek-harness) [![DSH 兼容](https://img.shields.io/badge/DSH-%3E%3D0.2.1--rc.5%20%3C1.0.0-blue)](https://github.com/deepseek-ai/deepseek-harness) [![Auto Translation](https://img.shields.io/badge/translation-auto%20CN-blueviolet)](#功能)
 
 一个 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的 Cordis 插件。在 Web 界面侧边栏底部停靠一个入口，点开即可浏览本机所有已安装的技能（SKILL.md）与当前会话的系统提示词；英文内容悬停可自动翻译成中文，并给出「怎么用」的大白话教程和可复制话术。
 
@@ -12,6 +12,16 @@
 - **悬停自动翻译**：鼠标停在英文技能上，先「翻译中…」再弹出中文名 + 中文说明 + 💡 用法。翻译调用本机已配置的大模型，结果缓存到 `~/.dsh/inspector-translations.json`，第二次秒出。
 - **怎么用栏目**：每个技能配中文说明、步骤安排和可复制的话术；新装技能靠自动翻译也能生成。
 - **中 / EN 切换**：默认中文，可一键切英文。
+
+## 兼容性
+
+| 插件版本 | DeepSeek Harness | 核心包 | 状态 |
+|---|---|---|---|
+| v1.0.1 | `>=0.2.1-rc.5 <1.0.0` | `@deepseek-ai/dsh-agent-preset` `0.2.1-rc.5+` | ✅ 当前推荐 |
+| v1.0.0 | `>=0.2.1-rc.5 <1.0.0` | 同上 | 可用 |
+
+- 已在 Harness **0.2.2-rc.1**（核心 0.2.1-rc.5）实测通过。
+- 依赖的宿主服务：`webServer`、`systemPrompt`、`workingDirectory`、`workspaceRegistry`、`llm`、`agentDefaultModel`。若某服务未挂载，对应功能会优雅降级，不会导致插件崩溃。
 
 ## 安装
 
