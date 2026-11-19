@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Skills & Prompt Inspector",
+    "description": "Docks a panel below the composer to browse every installed skill's full prompt and the assembled system prompt."
+  }
+}
