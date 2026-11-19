@@ -232,12 +232,17 @@ async function callLlm(ctx, items) {
   if (model) opts.model = model;
   for await (const chunk of ctx.llm.stream(opts)) {
     if (!chunk) continue;
-    if (chunk.kind === 'text-delta' || chunk.kind === 'text') text += (chunk.text || chunk.delta || '');
-    else if (chunk.delta && typeof chunk.delta === 'string') text += chunk.delta;
-    else if (chunk.kind === 'error') throw new Error((chunk.failure && chunk.failure.message) || 'LLM error');
+    const kind = chunk.type || chunk.kind;
+    if (kind === 'text-delta' || kind === 'text') text += (chunk.text || chunk.delta || '');
+    else if (kind === 'error' || kind === 'aborted') {
+      const f = chunk.failure || chunk.error;
+      throw new Error((f && (f.message || f.code)) || 'LLM stream error');
+    } else if (kind === 'finish' && chunk.failure) {
+      throw new Error((chunk.failure.message || chunk.failure.code) || 'LLM finish error');
+    }
   }
   const parsed = extractJSON(text);
-  if (!parsed) throw new Error('模型返回无法解析：' + text.slice(0, 120));
+  if (!parsed) throw new Error('模型返回无法解析（收到 ' + text.length + ' 字符）：' + text.slice(0, 160));
   return parsed;
 }
 

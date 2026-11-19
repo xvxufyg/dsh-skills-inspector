@@ -149,7 +149,8 @@ window.__ModuleLoader__.load({
   border:1px solid var(--dsw-alias-border-l2);border-radius:12px;
   box-shadow:0 12px 40px #0006;overflow:hidden}
 .si-head{display:flex;align-items:center;gap:6px;padding:8px 10px;
-  border-bottom:1px solid var(--dsw-alias-border-l1);flex-wrap:wrap}
+  border-bottom:1px solid var(--dsw-alias-border-l1);flex-wrap:wrap;
+  cursor:move;user-select:none;touch-action:none}
 .si-title{font-weight:600;margin-right:2px}
 .si-tab{padding:3px 10px;border:1px solid transparent;border-radius:6px;cursor:pointer;
   background:transparent;color:var(--dsw-alias-label-secondary);font:inherit}
@@ -248,6 +249,37 @@ window.__ModuleLoader__.load({
       // 合并静态字典与自动翻译：优先静态，其次自动
       const trOf = (name) => autoTr[name] || TRANSLATIONS[name] || null;
 
+      // 拖拽移动：按住标题栏拖动，限制在屏幕内，位置记到 localStorage
+      const overlayRef = useRef(null);
+      const dragRef = useRef(null);
+      const [dragPos, setDragPos] = useState(() => {
+        try { const s = localStorage.getItem('si-pos'); return s ? JSON.parse(s) : null; } catch (_) { return null; }
+      });
+      const startDrag = (e) => {
+        if (e.target && e.target.closest && e.target.closest('button')) return;
+        const el = overlayRef.current;
+        if (!el || e.button !== 0) return;
+        const rect = el.getBoundingClientRect();
+        dragRef.current = { px: e.clientX, py: e.clientY, left: rect.left, top: rect.top };
+        e.preventDefault();
+        const move = (ev) => {
+          const s = dragRef.current;
+          if (!s) return;
+          const w = el.offsetWidth, h = el.offsetHeight;
+          const left = Math.max(0, Math.min(s.left + ev.clientX - s.px, window.innerWidth - w));
+          const top = Math.max(0, Math.min(s.top + ev.clientY - s.py, window.innerHeight - h));
+          setDragPos({ left, top });
+        };
+        const up = () => {
+          dragRef.current = null;
+          window.removeEventListener('mousemove', move);
+          window.removeEventListener('mouseup', up);
+          setDragPos((p) => { if (p) { try { localStorage.setItem('si-pos', JSON.stringify(p)); } catch (_) {} } return p; });
+        };
+        window.addEventListener('mousemove', move);
+        window.addEventListener('mouseup', up);
+      };
+
       const clearTipTimers = () => { tipTimers.current.forEach(clearTimeout); tipTimers.current = []; };
       const hoverSkill = (skill, ev) => {
         clearTipTimers();
@@ -318,6 +350,14 @@ window.__ModuleLoader__.load({
 
       useEffect(() => () => clearTimeout(copyTimer.current), []);
 
+      // 按 ESC 关闭面板（和 × 按钮效果一样，自己决定用哪种）
+      useEffect(() => {
+        if (!open) return;
+        const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, [open]);
+
       if (!open) return null;
 
       const list = (skills && skills.skills) || [];
@@ -345,8 +385,12 @@ window.__ModuleLoader__.load({
       );
 
       return h(React.Fragment, null,
-        h('div', { className: 'si-overlay', role: 'dialog', 'aria-label': t.title },
-        h('div', { className: 'si-head' },
+        h('div', {
+          className: 'si-overlay', role: 'dialog', 'aria-label': t.title,
+          ref: overlayRef,
+          style: dragPos ? { left: dragPos.left, top: dragPos.top, bottom: 'auto' } : undefined,
+        },
+        h('div', { className: 'si-head', onMouseDown: startDrag, title: '按住标题栏拖动' },
           h('span', { className: 'si-title' }, t.title),
           h('button', {
             type: 'button', className: 'si-tab', role: 'tab',
