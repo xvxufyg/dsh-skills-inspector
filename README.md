@@ -1,5 +1,7 @@
 # 技能与提示词查看器（@local/skills-inspector）
 
+[![Release](https://img.shields.io/github/v/release/xvxufyg/dsh-skills-inspector?label=version)](https://github.com/xvxufyg/dsh-skills-inspector/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Platform](https://img.shields.io/badge/platform-DeepSeek%20Harness-orange)](https://github.com/deepseek-ai/deepseek-harness) [![Auto Translation](https://img.shields.io/badge/translation-auto%20CN-blueviolet)](#功能)
+
 一个 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的 Cordis 插件。在 Web 界面侧边栏底部停靠一个入口，点开即可浏览本机所有已安装的技能（SKILL.md）与当前会话的系统提示词；英文内容悬停可自动翻译成中文，并给出「怎么用」的大白话教程和可复制话术。
 
 ## 功能
